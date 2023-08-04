@@ -1,0 +1,48 @@
+From 0e283e56b4047405a7b2c4cd4a7feebd2bb3da92 Mon Sep 17 00:00:00 2001
+From: Hank Wei <weistreamingrtc.gmail.com>
+Date: Fri, 30 Jun 2023 11:13:05 -0400
+Subject: [PATCH] Updated tcp client to start the sdp process Disable screen
+ capture for now, use camera
+
+---
+ app/src/main/java/org/appspot/apprtc/CallActivity.java    | 3 ++-
+ app/src/main/java/org/appspot/apprtc/DirectRTCClient.java | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/app/src/main/java/org/appspot/apprtc/CallActivity.java b/app/src/main/java/org/appspot/apprtc/CallActivity.java
+index 10d2b6e..f801f1f 100644
+--- a/app/src/main/java/org/appspot/apprtc/CallActivity.java
++++ b/app/src/main/java/org/appspot/apprtc/CallActivity.java
+@@ -295,7 +295,8 @@ public class CallActivity extends Activity implements AppRTCClient.SignalingEven
+     int videoWidth = intent.getIntExtra(EXTRA_VIDEO_WIDTH, 0);
+     int videoHeight = intent.getIntExtra(EXTRA_VIDEO_HEIGHT, 0);
+ 
+-    screencaptureEnabled = intent.getBooleanExtra(EXTRA_SCREENCAPTURE, false);
++    //Hank screencaptureEnabled = intent.getBooleanExtra(EXTRA_SCREENCAPTURE, false);
++    screencaptureEnabled = false;
+     // If capturing format is not specified for screencapture, use screen resolution.
+     if (screencaptureEnabled && videoWidth == 0 && videoHeight == 0) {
+       DisplayMetrics displayMetrics = getDisplayMetrics();
+diff --git a/app/src/main/java/org/appspot/apprtc/DirectRTCClient.java b/app/src/main/java/org/appspot/apprtc/DirectRTCClient.java
+index 05b6edb..88b11bc 100644
+--- a/app/src/main/java/org/appspot/apprtc/DirectRTCClient.java
++++ b/app/src/main/java/org/appspot/apprtc/DirectRTCClient.java
+@@ -227,13 +227,13 @@ public class DirectRTCClient implements AppRTCClient, TCPChannelClient.TCPChanne
+    */
+   @Override
+   public void onTCPConnected(boolean isServer) {
+-    if (isServer) {
++    if (!isServer) {
+       roomState = ConnectionState.CONNECTED;
+ 
+       SignalingParameters parameters = new SignalingParameters(
+           // Ice servers are not needed for direct connections.
+           new ArrayList<>(),
+-          isServer, // Server side acts as the initiator on direct connections.
++          !isServer, // Server side acts as the initiator on direct connections.
+           null, // clientId
+           null, // wssUrl
+           null, // wwsPostUrl
+-- 
+2.28.0.windows.1
+
