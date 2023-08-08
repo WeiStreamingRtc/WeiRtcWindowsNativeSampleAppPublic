@@ -1,13 +1,19 @@
-## 
+## About this repo
 
-This is a demo app to demostrate windows native webrtc libs from WeiStreaming: WeiStreaming.WeiRtc.Native.lib.
+This is a sample app to demostrate windows native webrtc libs from WeiStreaming: WeiStreaming.WeiRtc.Native.lib.
 
 It can establish a webrtc call with Google AppRtc Android demo app.
 
-It can streaming from camera or desktop capture.
+It can streaming from camera or desktop capturer.
 
-It has a built-in simple signaling server using direct TCP. When started, it run as a TCP server listening in port: 8888.
+It has a built-in simple signaling server using direct TCP. When started, it run as a TCP server listening at port 8888.
 
+### Structure of this repo
+
+1. libwebrtc folder: this is the place for all the WebRtc header files and binary: webrtc.lib.
+2. libweirtc folder: this is the place for all the windows native WeiRtc header files and binary: WeiStreaming.WeiRtc.Native.lib.
+3. android-weirtc-patch.patch: this is patch that need to apply to Android AppRTCDemo app, see instructions below.
+4. WeiRtcSampleApp: this is the place for the sample code to demonstrate the APIs of WeiRtc: WeiStreaming.WeiRtc.Native.lib.
 ## Requirement for running the sample App.
 
 1. Visual Studio 2019 Version 16.6.2 or later.
@@ -35,9 +41,7 @@ Go to Settings to give this app permission for camera and mic.
 ## Current Status
 
 1. Able to Doing screen and camera capture
-2. If test desktop capture, do the following change on file: WeiRtcApp.cpp
-
-<img src="screen-share.jpg">
+2. When testing desktop capture, do the following change at file: WeiRtcApp.cpp. Note, you must have at least two displays, lib is hardcoded (for this beta version) to share the second display in order to demonstrate more clearly.
 
 ```
     _sample->AddVideoTrack(pipCanvas);
@@ -45,13 +49,20 @@ Go to Settings to give this app permission for camera and mic.
     //_sample->AddDesktopTrack(*_screenPipCanvas);
 ```
 
+Following pic is showing that windows side is doing screen share, android side is doing back facing camera.
+<img src="screen-share.jpg">
+
 ## Next steps
 
 1. Tear down.
 2. Add more track to existing connection.
 3. Mesh call.
 
+## About WeiStreaming
 
+With solid 5 years track record of constructing intricate WebRTC end-to-end video conferencing platforms, our mission is to provide afforable and easy to use WebRtc native SDKs for all popular platforms. So any native app can add WebRtc video conferencing features with minum cost.
+
+weistreamingrtc@gmail.com  
 
 
 
