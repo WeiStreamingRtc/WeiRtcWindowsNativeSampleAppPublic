@@ -32,6 +32,11 @@ You need to apply patches: android-weirtc-patch.patch. Copy android-weirtc-patch
 
 ```
  git am android-weirtc-patch.patch
+ 
+ //build with following command
+ ./gradlew  app:assembleDebug  --exclude-task app:compileDebugJavaWithJavac
+ //install
+ adb install "D:\git\WeiStreaming\android\AppRTCDemo\app\build\outputs\apk\debug\app-debug.apk"
 ```
 
 Install on your device, and when started, type in your windows box's IP address that is running this demo app.
