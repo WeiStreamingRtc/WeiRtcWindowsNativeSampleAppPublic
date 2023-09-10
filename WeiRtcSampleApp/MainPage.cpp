@@ -79,10 +79,11 @@ MainPage::MainPage() {
     delete[] reinterpret_cast<BYTE*>(pAddresses);
     WSACleanup();
 
-    InitializeAsync();
+    //Hank For websocket
+    //InitializeAsync();
 
     //Hank for TCP signalling
-    //Control().Start(to_hstring(ipAddress));
+    Control().Start(to_hstring(ipAddress));
 }
 
 winrt::Windows::Foundation::IAsyncAction MainPage::InitializeAsync()

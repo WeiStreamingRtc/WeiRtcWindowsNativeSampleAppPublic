@@ -96,8 +96,9 @@ struct WebRtcSample : public PeerConnectionOwner {
     const char* _videoLabel = "video_label";
 
     WeiRtcAppObserver* _observer;
-    //Hank Tcp: SimpleTcpSignaling _signaling;
-    SimpleWebSocketSignaling _signaling;
+    //Hank Tcp: 
+    SimpleTcpSignaling _signaling;
+    //SimpleWebSocketSignaling _signaling;
 
     PeerConnectionEventHandlerImpl _eventHandler =
         PeerConnectionEventHandlerImpl(&_signaling, this);
@@ -106,9 +107,10 @@ struct WebRtcSample : public PeerConnectionOwner {
 
     std::unique_ptr<WeiRtc::PeerConnection> _pc;
     
-    //Hank Tcp: WebRtcSample(winrt::hstring room) : _signaling() {}
-    //WebRtcSample(winrt::hstring room) : _signaling("ws://192.168.0.100:8889/ws") {}
-    WebRtcSample(winrt::hstring room) : _signaling((to_string(room))) {}
+    //Hank Tcp: 
+    WebRtcSample(winrt::hstring room) : _signaling() {}
+    //Hank websocket
+    //WebRtcSample(winrt::hstring room) : _signaling((to_string(room))) {}
 
     void CreatePeerConnection(winrt::Windows::UI::Xaml::UIElement canvas) {
         webrtc::PeerConnectionInterface::RTCConfiguration config;

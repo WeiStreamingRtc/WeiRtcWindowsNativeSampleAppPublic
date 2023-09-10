@@ -1,6 +1,6 @@
 ## About this repo
 
-This is a sample app to demostrate windows native webrtc libs from WeiStreaming: WeiStreaming.WeiRtc.Native.lib.
+This is a sample app to demostrate native WebRtc client library for Windows from WeiStreaming: WeiStreaming.WeiRtc.Native.lib, a working WinRtc.
 
 It can establish a webrtc call with Google AppRtc Android demo app.
 
@@ -57,11 +57,6 @@ Go to Settings to give this app permission for camera and mic.
 Following pic is showing that windows side is doing screen share, android side is doing back facing camera.
 <img src="screen-share.jpg">
 
-## Next steps
-
-1. Tear down.
-2. Add more track to existing connection.
-3. Mesh call.
 
 ## About WeiStreaming
 
