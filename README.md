@@ -65,7 +65,7 @@ Following pic is showing that windows side is doing screen share, android side i
 
 ## About WeiStreaming
 
-With solid 5 years track record of constructing intricate WebRTC end-to-end video conferencing platforms, our mission is to provide afforable and easy to use WebRtc native SDKs for all popular platforms. So any native app can add WebRtc video conferencing features with minum cost.
+With solid 5 years track record of constructing intricate WebRTC end-to-end video conferencing platforms, our mission is to provide easy to use WebRtc native SDKs for all popular platforms. So any native app can add WebRtc video conferencing features with minum cost.
 
 weistreamingrtc@gmail.com  
 

@@ -2,14 +2,15 @@
 #include "pch.h"
 
 #include "WeiRtcApp.h"
-#include "WeiRtcApp.g.cpp"
+#include "WeiRtcAppObserver.h"
 
 #include <stddef.h>
 #include <memory>
 
-#include "DirectTcpServer.h"
-#include "SimpleTcpSignaling.h"
-#include "TcpChannelEventsHandler.h"
+#include "tcpSignalling/DirectTcpServer.h"
+#include "tcpSignalling/SimpleTcpSignaling.h"
+#include "webSocketSignalling/SimpleWebSocketSignaling.h"
+#include "signalling/SimpleSignalling.h"
 
 #include "WeiRtc.h"
 #include "CreateSessionDescriptionObserver.h"
@@ -22,34 +23,41 @@
 #include "VideoSource.h"
 #include "MediaTypes.h"
 
+#include "ixwebsocket/IXNetSystem.h"
+#include "ixwebsocket/IXWebSocket.h"
+#include "ixwebsocket/IXUserAgent.h"
+#include <iostream>
+
 // clang-format on
 
-namespace winrt::WeiRtcSampleApp::implementation {
 
 struct PeerConnectionOwner {
     virtual void OnPeerConnectionDropped() = 0;
+    virtual void OnPeerConnectionEstablished() = 0;
 };
 
 struct PeerConnectionEventHandlerImpl : public WeiRtc::PeerConnectionEventHandler {
-    SimpleTcpSignaling* _signaling;
+    SimpleSignalling* _signaling;
     PeerConnectionOwner* _owner;
-    PeerConnectionEventHandlerImpl(SimpleTcpSignaling* signaling,
+    PeerConnectionEventHandlerImpl(SimpleSignalling* signaling,
                                    PeerConnectionOwner* owner)
         : _signaling(signaling), _owner(owner) {}
 
     void OnSdpCreated(const WeiRtc::SessionDescription& sdp) override {
         // Send the sdp
         std::string sdpStr = sdp.GetSdpAsString();
+        
+        /*
         winrt::Windows::Data::Json::JsonObject j_sdp;
 
-        auto j_val = winrt::Windows::Data::Json::JsonValue::CreateStringValue(
-            winrt::to_hstring(sdpStr));
-        auto j_type =
-            winrt::Windows::Data::Json::JsonValue::CreateStringValue(L"answer");
+        auto j_val = winrt::Windows::Data::Json::JsonValue::CreateStringValue(winrt::to_hstring(sdpStr));
+        auto j_type = winrt::Windows::Data::Json::JsonValue::CreateStringValue(L"answer");
         j_sdp.Insert(L"sdp", j_val);
-        j_sdp.Insert(L"type", j_type);
+        j_sdp.Insert(L"Type", j_type);
 
         _signaling->SendMessage((winrt::to_string(j_sdp.ToString())));
+        */
+        _signaling->SendAnswer(sdpStr);
     }
     void OnSdpCreationFailed(const char* msg) override {}
 
@@ -72,9 +80,11 @@ struct PeerConnectionEventHandlerImpl : public WeiRtc::PeerConnectionEventHandle
 
     void OnStandardizedIceConnectionChange(
         WeiRtc::PeerConnectionStates::IceConnectionState state) override {
-        if (state ==
-            WeiRtc::PeerConnectionStates::IceConnectionState::kIceConnectionFailed) {
+        if (state == WeiRtc::PeerConnectionStates::IceConnectionState::kIceConnectionFailed) {
             _owner->OnPeerConnectionDropped();
+        }
+        else if (state == WeiRtc::PeerConnectionStates::IceConnectionState::kIceConnectionConnected) {
+            _owner->OnPeerConnectionEstablished();
         }
     }
     void OnConnectionChange(
@@ -85,8 +95,9 @@ struct WebRtcSample : public PeerConnectionOwner {
     const char* _audioLabel = "audio_label";
     const char* _videoLabel = "video_label";
 
-
-    SimpleTcpSignaling _signaling;
+    WeiRtcAppObserver* _observer;
+    //Hank Tcp: SimpleTcpSignaling _signaling;
+    SimpleWebSocketSignaling _signaling;
 
     PeerConnectionEventHandlerImpl _eventHandler =
         PeerConnectionEventHandlerImpl(&_signaling, this);
@@ -94,7 +105,10 @@ struct WebRtcSample : public PeerConnectionOwner {
     WeiRtc::PeerConnectionFactory* _peerConnectionFactory = new WeiRtc::PeerConnectionFactory();
 
     std::unique_ptr<WeiRtc::PeerConnection> _pc;
-    WebRtcSample(winrt::hstring room) : _signaling() {}
+    
+    //Hank Tcp: WebRtcSample(winrt::hstring room) : _signaling() {}
+    //WebRtcSample(winrt::hstring room) : _signaling("ws://192.168.0.100:8889/ws") {}
+    WebRtcSample(winrt::hstring room) : _signaling((to_string(room))) {}
 
     void CreatePeerConnection(winrt::Windows::UI::Xaml::UIElement canvas) {
         webrtc::PeerConnectionInterface::RTCConfiguration config;
@@ -129,7 +143,24 @@ struct WebRtcSample : public PeerConnectionOwner {
 
         _pc.get()->Close();
         delete _peerConnectionFactory;
+
+        if (_observer != nullptr) _observer->OnPeerConnectionStatus(0);
     }
+
+    void OnPeerConnectionEstablished() {
+        if (_observer != nullptr) _observer->OnPeerConnectionStatus(1);
+    }
+
+    void CallSupport(winrt::hstring msg) {
+        _signaling.CallSupport(msg);
+    }
+
+    void SetAppObserver(WeiRtcAppObserver* ob)
+    {
+        _observer = ob;
+        _signaling.SetAppObserver(_observer);
+    }
+
 };
 
 WeiRtcApp::WeiRtcApp() { WeiRtc::InitializeWeiRtc(); }
@@ -142,41 +173,47 @@ WeiRtcApp::~WeiRtcApp() {
     WeiRtc::CleanupWeiRtc();
 }
 
-hstring WeiRtcApp::Room() const { return _room; }
+winrt::hstring WeiRtcApp::Room() const { return _room; }
 
-Windows::Foundation::IAsyncAction WeiRtcApp::Init(
-    Windows::UI::Xaml::UIElement canvas, Windows::UI::Xaml::UIElement pipCanvas,
-    Windows::UI::Xaml::UIElement screenPipCanvas, hstring room) {
+winrt::Windows::Foundation::IAsyncAction WeiRtcApp::Init(
+    winrt::Windows::UI::Xaml::UIElement canvas, winrt::Windows::UI::Xaml::UIElement pipCanvas,
+    winrt::Windows::UI::Xaml::UIElement screenPipCanvas, winrt::hstring room) {
     if (room.empty()) {
-        throw hresult_invalid_argument();
+        throw winrt::hresult_invalid_argument();
     }
 
     _room = room;
     _screenPipCanvas = &screenPipCanvas;
 
     // This is necessary to avoid STA
-    co_await resume_background();
+    co_await winrt::resume_background();
 
     _sample = new WebRtcSample(_room);
 
     _sample->CreatePeerConnection(canvas);
 
     _sample->AddAudioTrack();
-    _sample->AddVideoTrack(pipCanvas);
-    //Open this line and commented out the top line to test desktop capture.
-    //_sample->AddDesktopTrack(*_screenPipCanvas);
+    //_sample->AddVideoTrack(pipCanvas);
+    _sample->AddDesktopTrack(*_screenPipCanvas);
     
     // Call this at the as the last step
     _sample->StartSignalling();
+    //_sample->StartWebSocket();
+    _sample->SetAppObserver(_observer);
 }
 
-Windows::Foundation::IAsyncAction WeiRtcApp::StartDesktopCaptuer()
+winrt::Windows::Foundation::IAsyncAction WeiRtcApp::StartDesktopCaptuer()
 {
-    co_await resume_background();
+    co_await winrt::resume_background();
     _sample->AddDesktopTrack(*_screenPipCanvas);
 }
 
+void WeiRtcApp::CallSupport(winrt::hstring msg)
+{
+    _sample->CallSupport(msg);
+}
 
-
-}  // namespace winrt::WeiRtcSampleApp::implementation
-   // namespace winrt::WeiRtcSampleApp::implementation
+void WeiRtcApp::RegisterAppObserver(WeiRtcAppObserver* observer)
+{
+    _observer = observer;
+}
