@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="google-site-verification" content="lyeXf-gJki4a_aTnS7dxgPh2qfEHVDVC699dSf-aj7Y" />
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>About this repo | WeiRtcWindowsNativeSampleAppPublic</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="About this repo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="The Sample app to show the native WebRtc client library for Windows, a working WinRtc" />
+<meta property="og:description" content="The Sample app to show the native WebRtc client library for Windows, a working WinRtc" />
+<link rel="canonical" href="https://weistreamingrtc.github.io/WeiRtcWindowsNativeSampleAppPublic/" />
+<meta property="og:url" content="https://weistreamingrtc.github.io/WeiRtcWindowsNativeSampleAppPublic/" />
+<meta property="og:site_name" content="WeiRtcWindowsNativeSampleAppPublic" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="About this repo" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"The Sample app to show the native WebRtc client library for Windows, a working WinRtc","headline":"About this repo","name":"WeiRtcWindowsNativeSampleAppPublic","url":"https://weistreamingrtc.github.io/WeiRtcWindowsNativeSampleAppPublic/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/WeiRtcWindowsNativeSampleAppPublic/assets/css/style.css?v=8b5c929b3cb6f33cd5e2c7eb43d16cbee4cebd10">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/WeiRtcWindowsNativeSampleAppPublic/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://weistreamingrtc.github.io/WeiRtcWindowsNativeSampleAppPublic/">WeiRtcWindowsNativeSampleAppPublic</a></h1>
+      
+
+      <h2 id="about-this-repo">About this repo</h2>
+
+<p>This is a sample app to demostrate native WebRtc client library for Windows from WeiStreaming: WeiStreaming.WeiRtc.Native.lib, a working WinRtc.</p>
+
+<p>It can establish a webrtc call with Google AppRtc Android demo app.</p>
+
+<p>It can stream from camera or desktop capturer.</p>
+
+<p>It has a built-in simple signaling server using direct TCP. When started, it runs as a TCP server listening at port 8888.</p>
+
+<h3 id="structure-of-this-repo">Structure of this repo</h3>
+
+<ol>
+  <li><em>libwebrtc</em> folder: this folder holds all the WebRtc header files and binary: webrtc.lib.</li>
+  <li><em>libweirtc</em> folder: this folder holds all the windows native WeiRtc header files and binary: WeiStreaming.WeiRtc.Native.lib.</li>
+  <li><em>android-weirtc-patch.patch</em>: this is a patch that needs to be applied to Android AppRTCDemo app, see instructions below.</li>
+  <li><em>WeiRtcSampleApp</em>: this folder holds the sample code to demonstrate the APIs of WeiRtc: WeiStreaming.WeiRtc.Native.lib.
+    <h2 id="requirement-for-running-the-sample-app">Requirement for running the sample App.</h2>
+  </li>
+  <li>Visual Studio 2019 Version 16.6.2 or later.</li>
+  <li>At least 8GB of RAM (16GB of RAM is recommended).</li>
+  <li>At least 15GB of disk space.</li>
+  <li>Windows x64 and 10 above</li>
+  <li>Two displays in order to better demonstrate the desktop capture feature</li>
+</ol>
+
+<h2 id="build-and-install-android-apprtc-demo-app">Build and Install Android AppRtc demo app</h2>
+
+<p>Download and build Google AppRtc Android demo app: https://github.com/njovy/AppRTCDemo</p>
+
+<p>You can also build it from webrtc open source project: https://chromium.googlesource.com/external/webrtc/stable/talk/+/33ff0831ca67eeb4e33cfb4e0a0b68c6cc631ccc/examples/android/</p>
+
+<p>You need to apply patches: android-weirtc-patch.patch. Copy android-weirtc-patch.patch to the root of Android AppRtc demo app code, then run following command.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> git am android-weirtc-patch.patch
+ 
+ //build with following command
+ ./gradlew  app:assembleDebug  --exclude-task app:compileDebugJavaWithJavac
+ //install
+ adb install "D:\git\WeiStreaming\android\AppRTCDemo\app\build\outputs\apk\debug\app-debug.apk"
+</code></pre></div></div>
+
+<p>Install on your device, and when started, type in your windows box’s IP address that is running this demo app.</p>
+
+<p>Go to Settings to give this app permission for camera and mic.</p>
+
+<h2 id="current-status">Current Status</h2>
+
+<ol>
+  <li>Capable of screen and camera capture</li>
+  <li>When testing desktop capture, make the following change in file: WeiRtcApp.cpp. Note, you must have at least two displays, lib is hardcoded (for this beta version) to share the second display in order to demonstrate more clearly.</li>
+</ol>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    _sample-&gt;AddVideoTrack(pipCanvas);
+    //Uncomment this line below and comment out the line above to test desktop capture.
+    //_sample-&gt;AddDesktopTrack(*_screenPipCanvas);
+</code></pre></div></div>
+
+<p>Following pic is showing that windows side is doing screen share, android side is doing back facing camera.
+<img src="screen-share.jpg" /></p>
+
+<h2 id="about-weistreaming">About WeiStreaming</h2>
+
+<p>With solid 5 years track record of constructing intricate WebRTC end-to-end video conferencing platforms, our mission is to provide easy to use WebRtc native SDKs for all popular platforms. So any native app can add WebRtc video conferencing features with minum cost.</p>
+
+<p>weistreamingrtc@gmail.com</p>
+
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>
